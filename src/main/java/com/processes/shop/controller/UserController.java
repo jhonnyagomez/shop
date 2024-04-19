@@ -3,6 +3,8 @@ package com.processes.shop.controller;
 import com.processes.shop.model.User;
 import com.processes.shop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,21 +16,31 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping
-    public User createUser(@RequestBody User user){
-        return userService.createUser(user);
+    public ResponseEntity<User> createUser(@RequestBody User user){
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(userService.createUser(user));
     }
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id){
-        return userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+
+        return ResponseEntity
+                .ok()
+                .body(userService.getUserById(id));
     }
 
     @PostMapping("/{id}")
-    public User updateUser(@RequestBody User user, @PathVariable Long id){
-        return userService.updateUser(user, id);
+    public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id){
+        return ResponseEntity
+                .ok()
+                .body(userService.updateUser(user, id));
     }
 
     @GetMapping
-    public List<User> allUsers(){
-        return userService.findAllUsers();
+    public ResponseEntity<List<User>> allUsers(){
+        return ResponseEntity
+                .ok()
+                .body(userService.findAllUsers());
     }
 }
