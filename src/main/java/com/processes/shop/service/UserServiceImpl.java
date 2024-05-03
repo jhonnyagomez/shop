@@ -1,13 +1,13 @@
 package com.processes.shop.service;
 
-import com.processes.shop.model.Address;
+import com.processes.shop.exceptions.AlreadyExistsException;
+import com.processes.shop.exceptions.NotFoundException;
 import com.processes.shop.model.User;
-import com.processes.shop.model.enums.DocumentType;
+import com.processes.shop.model.enums.ErrorMessages;
 import com.processes.shop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +18,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User createUser(User user) {
-
+        Optional<User> userFindByEmail = userRepository.findByEmail(user.getEmail());
+        if (userFindByEmail.isPresent()){
+            throw new AlreadyExistsException(ErrorMessages.USER_EMAIL_EXISTS.getMessage());
+        }
         return userRepository.save(user);
     }
 
@@ -27,10 +30,15 @@ public class UserServiceImpl implements UserService{
 
         Optional<User> userBd = userRepository.findById(id);
         if (userBd.isEmpty()){
-            return null;
+            throw new NotFoundException(ErrorMessages.USER_NOT_FOUND.getMessage());
+        }
+        Optional<User> userFindByEmail = userRepository.findByEmailAndIdNot(userUpdated.getEmail(), id);
+        if (userFindByEmail.isPresent()){
+            throw new AlreadyExistsException(ErrorMessages.USER_EMAIL_EXISTS.getMessage());
         }
         userBd.get().setFullName(userUpdated.getFullName());
         userBd.get().setPhoneNumber(userUpdated.getPhoneNumber());
+        userBd.get().setEmail(userUpdated.getEmail());
         return userRepository.save(userBd.get());
     }
 
@@ -38,7 +46,7 @@ public class UserServiceImpl implements UserService{
     public User getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()){
-            return null;
+            throw new NotFoundException(ErrorMessages.USER_NOT_FOUND.getMessage());
         }
         return user.get();
     }
