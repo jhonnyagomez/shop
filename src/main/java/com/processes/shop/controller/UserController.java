@@ -2,6 +2,9 @@ package com.processes.shop.controller;
 
 import com.processes.shop.model.User;
 import com.processes.shop.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +19,14 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user){
+    public ResponseEntity<User> createUser(@RequestBody @Valid User user){
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(userService.createUser(user));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id){
+    public ResponseEntity<User> getUserById(@PathVariable @Min(1) Long id){
 
         return ResponseEntity
                 .ok()
@@ -31,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable Long id){
+    public ResponseEntity<User> updateUser(@RequestBody @Valid User user, @PathVariable @Min(1) Long id){
         return ResponseEntity
                 .ok()
                 .body(userService.updateUser(user, id));
